@@ -1,0 +1,25 @@
+
+name: Build and Release ZIP
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger when a tag is pushed, for example v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create ZIP archive
+        run: |
+          zip -r eleads.zip upload/ README.md LICENSE
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: eleads.zip
+          token: ${{ secrets.GITHUB_TOKEN }}

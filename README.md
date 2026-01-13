@@ -45,10 +45,10 @@ Standard OpenCart 1.5 module installation.
 ### 1️⃣ Upload files
 Copy the contents of the `upload/` directory to your OpenCart root directory:
 
+`
 /admin
 /catalog
-/system
-
+`
 
 ### 2️⃣ Install the module
 1. Go to **Admin → Extensions → Modules**
@@ -68,9 +68,9 @@ In the module settings:
 
 After installation and activation, the product feed will be available at:
 
-https://your-store.com/index.php?route=feed/eleads
+`https://your-store.com/index.php?route=feed/eleads`
 If SEO URLs are enabled:
-https://your-store.com/eleads-feed
+`https://your-store.com/eleads-feed`
 
 
 > The feed URL is used by the E-Leads platform to import and process product data.
