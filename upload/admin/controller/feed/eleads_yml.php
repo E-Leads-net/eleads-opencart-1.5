@@ -45,10 +45,34 @@ class ControllerFeedEleadsYml extends Controller {
 		$key = (string)$this->config->get('eleads_yml_key');
 		$base_url = (defined('HTTPS_CATALOG') && HTTPS_CATALOG) ? HTTPS_CATALOG : HTTP_CATALOG;
 
-		if ($key !== '') {
-			$this->data['feed_url'] = $base_url . 'index.php?route=feed/eleads_yml&key=' . urlencode($key);
-		} else {
-			$this->data['feed_url'] = $base_url . 'index.php?route=feed/eleads_yml';
+		// --------------------------------------------------
+		// Feed URLs for all languages
+		// --------------------------------------------------
+		$this->load->model('localisation/language');
+		$languages = $this->model_localisation_language->getLanguages();
+		$key = (string)$this->config->get('eleads_yml_key');
+
+		$base_url = (defined('HTTPS_CATALOG') && HTTPS_CATALOG) ? HTTPS_CATALOG : HTTP_CATALOG;
+
+		$this->data['feed_urls'] = array();
+
+		foreach ($languages as $lang) {
+			if (!$lang['status']) continue;
+
+			$lang_id = (int)$lang['language_id'];
+
+			$url = $base_url . 'index.php?route=feed/eleads_yml&language_id=' . $lang_id;
+
+			if ($key !== '') {
+				$url .= '&key=' . urlencode($key);
+			}
+
+			$this->data['feed_urls'][] = array(
+				'name' => $lang['name'],
+				'code' => $lang['code'],
+				'language_id' => $lang_id,
+				'url'  => $url
+			);
 		}
 
 		if (isset($this->error['warning'])) {

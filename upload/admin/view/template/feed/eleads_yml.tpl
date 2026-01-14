@@ -20,10 +20,24 @@
 		</div>
 
 		<div class="content">
-			<div style="margin-bottom:10px; padding:10px; background:#f7f7f7; border:1px solid #ddd;">
-				<b><?php echo $help_feed_url; ?></b>
-				<code><?php echo $feed_url; ?></code>
-			</div>
+			<table class="form">
+				<tr>
+					<td><?php echo $help_feed_url; ?></td>
+					<td>
+						<?php foreach ($feed_urls as $feed) { ?>
+							<div style="margin-bottom:6px;">
+								<strong><?php echo $feed['name']; ?> (<?php echo $feed['code']; ?>)</strong><br />
+								<input type="text"
+									value="<?php echo $feed['url']; ?>"
+									style="width:100%;"
+									readonly
+									onclick="this.select();" />
+							</div>
+						<?php } ?>
+					</td>
+				</tr>
+			</table>
+
 
 			<form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
 

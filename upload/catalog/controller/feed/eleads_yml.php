@@ -19,6 +19,10 @@ class ControllerFeedEleadsYml extends Controller
 			}
 		}
 
+		if (isset($this->request->get['language_id'])) {
+			$this->config->set('config_language_id', $this->request->get['language_id']);
+		}
+
 		$this->load->model('catalog/category');
 		$this->load->model('catalog/product');
 
