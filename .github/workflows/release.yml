@@ -1,10 +1,12 @@
-
 name: Build and Release ZIP
 
 on:
   push:
     tags:
-      - 'v*'  # Trigger when a tag is pushed, for example v1.0.0
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -22,4 +24,3 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: eleads.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
