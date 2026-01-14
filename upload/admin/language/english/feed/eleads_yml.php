@@ -18,9 +18,16 @@ $_['text_unselect_all'] = 'Unselect all';
 $_['entry_categories']  = 'Categories';
 $_['help_categories']   = 'Select categories to export. If none selected — all categories will be exported.';
 
+$_['entry_filter_attributes'] = 'Attributes for filtering';
+$_['help_filter_attributes']  = 'Selected attributes will be exported as param filter="true"';
+
+$_['entry_filter_options'] = 'Options for filtering';
+$_['help_filter_options']  = 'Selected options will be exported as param filter="true"';
+
 $_['entry_shop_name'] = 'Shop name';
 $_['entry_email'] = 'email';
 $_['entry_url'] = 'store url';
+$_['entry_currency'] = 'Сurrency';
 
 $_['entry_pictures_limit'] = 'Pictures limit (picture)';
 $_['entry_short_source'] = 'short_description source';

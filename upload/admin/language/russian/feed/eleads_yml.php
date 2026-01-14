@@ -18,9 +18,16 @@ $_['text_unselect_all'] = 'Снять выделение';
 $_['entry_categories']  = 'Категории';
 $_['help_categories']   = 'Отметьте категории для выгрузки. Если ничего не отмечено — выгружаются все категории.';
 
+$_['entry_filter_attributes'] = 'Атрибуты для фильтрации';
+$_['help_filter_attributes']  = 'Отмеченные атрибуты будут выгружаться как param filter="true"';
+
+$_['entry_filter_options'] = 'Опции для фильтрации';
+$_['help_filter_options']  = 'Отмеченные опции будут выгружаться как param filter="true"';
+
 $_['entry_shop_name'] = 'Название магазина';
 $_['entry_email'] = 'email';
 $_['entry_url'] = 'url магазина';
+$_['entry_currency'] = 'Валюта';
 
 $_['entry_pictures_limit'] = 'Лимит картинок (picture)';
 $_['entry_short_source'] = 'Источник short_description';

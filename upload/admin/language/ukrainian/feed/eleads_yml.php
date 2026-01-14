@@ -19,9 +19,16 @@ $_['text_unselect_all'] = 'Зняти позначення';
 $_['entry_categories']  = 'Категорії';
 $_['help_categories']   = 'Позначте категорії для вивантаження. Якщо нічого не вибрано — вивантажуються всі категорії.';
 
+$_['entry_filter_attributes'] = 'Атрибути для фільтрації';
+$_['help_filter_attributes']  = 'Позначені атрибути будуть вивантажуватись як param filter="true"';
+
+$_['entry_filter_options'] = 'Опції для фільтрації';
+$_['help_filter_options']  = 'Позначені опції будуть вивантажуватись як param filter="true"';
+
 $_['entry_shop_name'] = 'Назва магазину';
 $_['entry_email'] = 'email';
 $_['entry_url'] = 'url магазину';
+$_['entry_currency'] = 'Валюта';
 
 $_['entry_pictures_limit'] = 'Ліміт зображень (picture)';
 $_['entry_short_source'] = 'Джерело short_description';

@@ -27,6 +27,12 @@ class ControllerFeedEleadsYml extends Controller {
 		$this->data['text_select_all']   = $this->language->get('text_select_all');
 		$this->data['text_unselect_all'] = $this->language->get('text_unselect_all');
 
+		$this->data['entry_filter_attributes'] = $this->language->get('entry_filter_attributes');
+		$this->data['help_filter_attributes']  = $this->language->get('help_filter_attributes');
+
+		$this->data['entry_filter_options'] = $this->language->get('entry_filter_options');
+		$this->data['help_filter_options']  = $this->language->get('help_filter_options');
+
 		$this->data['entry_status']      = $this->language->get('entry_status');
 		$this->data['entry_categories']  = $this->language->get('entry_categories');
 		$this->data['help_categories']   = $this->language->get('help_categories');
@@ -34,6 +40,7 @@ class ControllerFeedEleadsYml extends Controller {
 		$this->data['entry_shop_name']   = $this->language->get('entry_shop_name');
 		$this->data['entry_email']       = $this->language->get('entry_email');
 		$this->data['entry_url']         = $this->language->get('entry_url');
+		$this->data['entry_currency']         = $this->language->get('entry_currency');
 
 		$this->data['entry_pictures_limit'] = $this->language->get('entry_pictures_limit');
 		$this->data['entry_short_source'] = $this->language->get('entry_short_source');
@@ -60,8 +67,13 @@ class ControllerFeedEleadsYml extends Controller {
 			if (!$lang['status']) continue;
 
 			$lang_id = (int)$lang['language_id'];
+			$lang_code = $lang['code'];
 
 			$url = $base_url . 'index.php?route=feed/eleads_yml&language_id=' . $lang_id;
+
+			if ($lang_code) {
+				$url .= '&language_code=' . urlencode($lang_code);
+			}
 
 			if ($key !== '') {
 				$url .= '&key=' . urlencode($key);
@@ -128,10 +140,59 @@ class ControllerFeedEleadsYml extends Controller {
 			'eleads_yml_shop_name',
 			'eleads_yml_email',
 			'eleads_yml_url',
+			'eleads_yml_currency',
 			'eleads_yml_currency_id',
 			'eleads_yml_pictures_limit',
 			'eleads_yml_short_source',
+			'eleads_yml_filter_attributes',
+			'eleads_yml_filter_options',
 		);
+
+		// ----------------------
+		// FILTER ATTRIBUTES
+		// ----------------------
+		$this->load->model('catalog/attribute');
+		$selected_attr = $this->config->get('eleads_yml_filter_attributes');
+		if (!is_array($selected_attr)) $selected_attr = array();
+
+		if (isset($this->request->post['eleads_yml_filter_attributes']) && is_array($this->request->post['eleads_yml_filter_attributes'])) {
+			$selected_attr = $this->request->post['eleads_yml_filter_attributes'];
+		}
+
+		$this->data['eleads_yml_filter_attributes'] = array_map('intval', $selected_attr);
+
+		$attr_filter = array(
+			'sort'  => 'ad.name',
+			'order' => 'ASC',
+			'start' => 0,
+			'limit' => 100000
+		);
+
+		$this->data['attributes'] = $this->model_catalog_attribute->getAttributes($attr_filter);
+
+
+		// ----------------------
+		// FILTER OPTIONS
+		// ----------------------
+		$this->load->model('catalog/option');
+		$selected_opt = $this->config->get('eleads_yml_filter_options');
+		if (!is_array($selected_opt)) $selected_opt = array();
+
+		if (isset($this->request->post['eleads_yml_filter_options']) && is_array($this->request->post['eleads_yml_filter_options'])) {
+			$selected_opt = $this->request->post['eleads_yml_filter_options'];
+		}
+
+		$this->data['eleads_yml_filter_options'] = array_map('intval', $selected_opt);
+
+		$opt_filter = array(
+			'sort'  => 'od.name',
+			'order' => 'ASC',
+			'start' => 0,
+			'limit' => 100000
+		);
+
+		$this->data['options'] = $this->model_catalog_option->getOptions($opt_filter);
+
 
 		foreach ($fields as $f) {
 			if (isset($this->request->post[$f])) {
@@ -151,8 +212,8 @@ class ControllerFeedEleadsYml extends Controller {
 		if ($this->data['eleads_yml_url'] === null || $this->data['eleads_yml_url'] === '') {
 			$this->data['eleads_yml_url'] = $base_url;
 		}
-		if ($this->data['eleads_yml_currency_id'] === null || $this->data['eleads_yml_currency_id'] === '') {
-			$this->data['eleads_yml_currency_id'] = $this->config->get('config_currency') ? $this->config->get('config_currency') : 'UAH';
+		if ($this->data['eleads_yml_currency'] === null || $this->data['eleads_yml_currency'] === '') {
+			$this->data['eleads_yml_currency'] = $this->config->get('config_currency') ? $this->config->get('config_currency') : 'UAH';
 		}
 		if ($this->data['eleads_yml_pictures_limit'] === null || (int)$this->data['eleads_yml_pictures_limit'] <= 0) {
 			$this->data['eleads_yml_pictures_limit'] = 10;
@@ -177,13 +238,14 @@ class ControllerFeedEleadsYml extends Controller {
 			'eleads_yml_status' => 1,
 			'eleads_yml_key' => '',
 			'eleads_yml_categories' => array(),
-
 			'eleads_yml_shop_name' => $this->config->get('config_name'),
 			'eleads_yml_email' => $this->config->get('config_email'),
 			'eleads_yml_url' => rtrim((defined('HTTPS_CATALOG') && HTTPS_CATALOG) ? HTTPS_CATALOG : HTTP_CATALOG, '/'),
-			'eleads_yml_currency_id' => $this->config->get('config_currency') ? $this->config->get('config_currency') : 'UAH',
+			'eleads_yml_currency' => $this->config->get('config_currency') ? $this->config->get('config_currency') : 'UAH',
 			'eleads_yml_pictures_limit' => 10,
-			'eleads_yml_short_source' => 'meta_description'
+			'eleads_yml_short_source' => 'meta_description',
+			'eleads_yml_filter_attributes' => array(),
+			'eleads_yml_filter_options' => array(),
 		);
 
 		$this->model_setting_setting->editSetting('eleads_yml', $defaults);
