@@ -13,18 +13,17 @@ $_['entry_status'] = 'Статус модуля';
 $_['entry_key'] = 'Ключ доступа (опционально)';
 $_['help_key'] = 'Если задан, фид будет доступен только с параметром &key=...';
 
-$_['entry_agency'] = 'agency';
+$_['text_select_all']   = 'Выделить все';
+$_['text_unselect_all'] = 'Снять выделение';
+$_['entry_categories']  = 'Категории';
+$_['help_categories']   = 'Отметьте категории для выгрузки. Если ничего не отмечено — выгружаются все категории.';
+
+$_['entry_shop_name'] = 'Название магазина';
 $_['entry_email'] = 'email';
 $_['entry_url'] = 'url магазина';
 
 $_['entry_pictures_limit'] = 'Лимит картинок (picture)';
-$_['entry_export_description'] = 'Экспорт description';
-$_['entry_export_short_description'] = 'Экспорт short_description';
 $_['entry_short_source'] = 'Источник short_description';
-$_['entry_price_mode'] = 'Режим цены';
-
-$_['text_price_mode_base'] = 'Только базовая цена (без special)';
-$_['text_price_mode_special'] = 'Если есть special: price=special, old_price=base';
 
 $_['help_feed_url'] = 'URL фида: ';
 

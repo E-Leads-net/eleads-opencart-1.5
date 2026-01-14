@@ -44,35 +44,48 @@
 					</tr>
 
 					<tr>
+						<td><?php echo $entry_categories; ?></td>
+						<td>
+							<div class="scrollbox" style="height: 220px;">
+								<?php $class = 'odd'; ?>
+								<?php foreach ($categories as $category) { ?>
+									<?php $class = ($class == 'even' ? 'odd' : 'even'); ?>
+									<div class="<?php echo $class; ?>">
+										<?php if (in_array($category['category_id'], $eleads_yml_categories)) { ?>
+											<input type="checkbox"
+												   name="eleads_yml_categories[]"
+												   value="<?php echo $category['category_id']; ?>"
+												   checked="checked" />
+											<?php echo $category['name']; ?>
+										<?php } else { ?>
+											<input type="checkbox"
+												   name="eleads_yml_categories[]"
+												   value="<?php echo $category['category_id']; ?>" />
+											<?php echo $category['name']; ?>
+										<?php } ?>
+									</div>
+								<?php } ?>
+							</div>
+
+							<a onclick="$(this).parent().find(':checkbox').attr('checked', true);"><?php echo $text_select_all; ?></a>
+							/
+							<a onclick="$(this).parent().find(':checkbox').attr('checked', false);"><?php echo $text_unselect_all; ?></a>
+
+							<div class="help"><?php echo $help_categories; ?></div>
+						</td>
+					</tr>
+
+
+					<tr>
 						<td><?php echo $entry_key; ?><br><span class="help"><?php echo $help_key; ?></span></td>
 						<td><input type="text" name="eleads_yml_key" value="<?php echo $eleads_yml_key; ?>" style="width:300px" /></td>
 					</tr>
 
-					<tr><td><?php echo $entry_agency; ?></td><td><input type="text" name="eleads_yml_agency" value="<?php echo $eleads_yml_agency; ?>" style="width:300px" /></td></tr>
+					<tr><td><?php echo $entry_shop_name; ?></td><td><input type="text" name="eleads_yml_shop_name" value="<?php echo $eleads_yml_shop_name; ?>" style="width:300px" /></td></tr>
 					<tr><td><?php echo $entry_email; ?></td><td><input type="text" name="eleads_yml_email" value="<?php echo $eleads_yml_email; ?>" style="width:300px" /></td></tr>
 					<tr><td><?php echo $entry_url; ?></td><td><input type="text" name="eleads_yml_url" value="<?php echo $eleads_yml_url; ?>" style="width:420px" /></td></tr>
 
 					<tr><td><?php echo $entry_pictures_limit; ?></td><td><input type="text" name="eleads_yml_pictures_limit" value="<?php echo $eleads_yml_pictures_limit; ?>" style="width:120px" /></td></tr>
-
-					<tr>
-						<td><?php echo $entry_export_description; ?></td>
-						<td>
-							<select name="eleads_yml_export_description">
-								<option value="1" <?php echo ($eleads_yml_export_description ? 'selected' : ''); ?>><?php echo $text_yes; ?></option>
-								<option value="0" <?php echo (!$eleads_yml_export_description ? 'selected' : ''); ?>><?php echo $text_no; ?></option>
-							</select>
-						</td>
-					</tr>
-
-					<tr>
-						<td><?php echo $entry_export_short_description; ?></td>
-						<td>
-							<select name="eleads_yml_export_short_description">
-								<option value="1" <?php echo ($eleads_yml_export_short_description ? 'selected' : ''); ?>><?php echo $text_yes; ?></option>
-								<option value="0" <?php echo (!$eleads_yml_export_short_description ? 'selected' : ''); ?>><?php echo $text_no; ?></option>
-							</select>
-						</td>
-					</tr>
 
 					<tr>
 						<td><?php echo $entry_short_source; ?></td>
@@ -80,16 +93,6 @@
 							<select name="eleads_yml_short_source">
 								<option value="meta_description" <?php echo ($eleads_yml_short_source=='meta_description' ? 'selected' : ''); ?>>meta_description</option>
 								<option value="description" <?php echo ($eleads_yml_short_source=='description' ? 'selected' : ''); ?>>description</option>
-							</select>
-						</td>
-					</tr>
-
-					<tr>
-						<td><?php echo $entry_price_mode; ?></td>
-						<td>
-							<select name="eleads_yml_price_mode">
-								<option value="base_only" <?php echo ($eleads_yml_price_mode=='base_only' ? 'selected' : ''); ?>><?php echo $text_price_mode_base; ?></option>
-								<option value="special_as_price" <?php echo ($eleads_yml_price_mode=='special_as_price' ? 'selected' : ''); ?>><?php echo $text_price_mode_special; ?></option>
 							</select>
 						</td>
 					</tr>
