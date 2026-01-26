@@ -80,7 +80,6 @@ class ControllerFeedEleadsYml extends Controller
 		if (!is_array($filter_option_ids)) $filter_option_ids = array();
 		$filter_option_ids = $this->normalizeIntList($filter_option_ids);
 
-		// for fast checks
 		$filter_attribute_map = array();
 		foreach ($filter_attribute_ids as $id) $filter_attribute_map[$id] = true;
 
@@ -153,144 +152,56 @@ class ControllerFeedEleadsYml extends Controller
 
 			// options -> params (with optional filter="true")
 			$options = $this->model_catalog_product->getProductOptions($product_id);
-			$variant_option = $this->getVariantOption($options); // first option that has option_value
 
-			if ($variant_option) {
-				// One product => many offers (variants)
-				$variant_option_id = isset($variant_option['option_id']) ? (int)$variant_option['option_id'] : 0;
-				$opt_name = trim((string)$variant_option['name']);
+			$qty = (int)$product_info['quantity'];
+			$available    = ($qty > 0) ? 'true' : 'false';
+			$stock_status = ($qty > 0) ? 'На складе' : 'Нет в наличии';
 
-				foreach ($variant_option['option_value'] as $ov) {
-					$product_option_value_id = isset($ov['product_option_value_id']) ? (int)$ov['product_option_value_id'] : 0;
-					$option_value_id         = isset($ov['option_value_id']) ? (int)$ov['option_value_id'] : 0;
+			$price = $base_price;
+			$old_price = '';
 
-					$val_name = isset($ov['name']) ? trim((string)$ov['name']) : '';
-					if ($val_name === '') continue;
-
-					$variant_id = $product_id . '-' . ($product_option_value_id ? $product_option_value_id : $option_value_id);
-
-					$qty = isset($ov['quantity']) ? (int)$ov['quantity'] : (int)$product_info['quantity'];
-
-					$adj = $this->getOptionPriceAdjustment($ov);
-
-					$base_with_opt    = $base_price + $adj;
-					$special_with_opt = ($special_price !== null) ? ((float)$special_price + $adj) : null;
-
-					$price = $base_with_opt;
-					$old_price = '';
-
-					if ($price_mode === 'special_as_price' && $special_with_opt !== null) {
-						$price = $special_with_opt;
-						$old_price = $this->formatMoney($base_with_opt);
-					}
-
-					$available    = ($qty > 0) ? 'true' : 'false';
-					$stock_status = ($qty > 0) ? 'На складе' : 'Нет в наличии';
-
-					$name = $this->sanitizeText($product_info['name'] . ' (' . $opt_name . ': ' . $val_name . ')');
-
-					$xml->startElement('offer');
-					$xml->writeAttribute('id', (string)$variant_id);
-					$xml->writeAttribute('group_id', (string)$product_id);
-					$xml->writeAttribute('available', $available);
-
-					$this->writeElementAlways($xml, 'url', $this->url->link('product/product', 'product_id=' . $product_id, ''));
-					$this->writeElementAlways($xml, 'name', $name);
-					$this->writeElementAlways($xml, 'price', $this->formatMoney($price));
-					$this->writeElementAlways($xml, 'old_price', $old_price);
-					$this->writeElementAlways($xml, 'currency', $currency);
-					$this->writeElementAlways($xml, 'categoryId', $category_id ? (string)$category_id : '');
-					$this->writeElementAlways($xml, 'quantity', (string)$qty);
-					$this->writeElementAlways($xml, 'stock_status', $stock_status);
-
-					// pictures (at least one tag)
-					if (!empty($images)) {
-						foreach ($images as $u) $this->writeElementAlways($xml, 'picture', $u);
-					} else {
-						$this->writeElementAlways($xml, 'picture', '');
-					}
-
-					$this->writeElementAlways($xml, 'vendor', !empty($product_info['manufacturer']) ? $this->sanitizeText($product_info['manufacturer']) : '');
-
-					$vendor_code = !empty($product_info['model']) ? $this->sanitizeText($product_info['model']) : '';
-					if ($vendor_code !== '') $vendor_code .= '-' . ($product_option_value_id ? $product_option_value_id : $option_value_id);
-					$this->writeElementAlways($xml, 'sku', $vendor_code);
-
-					$this->writeElementAlways($xml, 'label', '');
-					$this->writeElementAlways($xml, 'order', $sort_order);
-
-					$desc = $this->plainText($product_info['description']);
-					$this->writeElementAlways($xml, 'description', $this->sanitizeText($desc));
-
-					$short = $this->getShortDescription($product_info, $desc, $short_source);
-					$this->writeElementAlways($xml, 'short_description', ($short !== '') ? $this->sanitizeText($short) : '');
-
-					// attributes params
-					$this->writeParams($xml, $attributes_params);
-
-					// other options params (exclude variant option itself)
-					$this->writeOptionsParams($xml, $options, $filter_option_map, $variant_option_id);
-
-					// variant option param (only chosen value), with filter="true" if option is marked
-					$is_filter = ($variant_option_id > 0 && isset($filter_option_map[$variant_option_id]));
-					$this->writeParam($xml, $opt_name, $val_name, $is_filter);
-
-					$xml->endElement(); // offer
-				}
-			} else {
-				// Single offer (no variant options)
-				$qty = (int)$product_info['quantity'];
-				$sort_order = (int)$product_info['sort_order'];
-
-				$available    = ($qty > 0) ? 'true' : 'false';
-				$stock_status = ($qty > 0) ? 'На складе' : 'Нет в наличии';
-
-				$price = $base_price;
-				$old_price = '';
-
-				if ($price_mode === 'special_as_price' && $special_price !== null) {
-					$price = (float)$special_price;
-					$old_price = $this->formatMoney($base_price);
-				}
-
-				$xml->startElement('offer');
-				$xml->writeAttribute('id', (string)$product_id);
-				$xml->writeAttribute('available', $available);
-
-				$this->writeElementAlways($xml, 'url', $this->url->link('product/product', 'product_id=' . $product_id, ''));
-				$this->writeElementAlways($xml, 'name', $this->sanitizeText($product_info['name']));
-				$this->writeElementAlways($xml, 'price', $this->formatMoney($price));
-				$this->writeElementAlways($xml, 'old_price', $old_price);
-				$this->writeElementAlways($xml, 'currency', $currency);
-				$this->writeElementAlways($xml, 'categoryId', $category_id ? (string)$category_id : '');
-				$this->writeElementAlways($xml, 'quantity', (string)$qty);
-				$this->writeElementAlways($xml, 'stock_status', $stock_status);
-
-				if (!empty($images)) {
-					foreach ($images as $u) $this->writeElementAlways($xml, 'picture', $u);
-				} else {
-					$this->writeElementAlways($xml, 'picture', '');
-				}
-
-				$this->writeElementAlways($xml, 'vendor', !empty($product_info['manufacturer']) ? $this->sanitizeText($product_info['manufacturer']) : '');
-				$this->writeElementAlways($xml, 'sku', !empty($product_info['model']) ? $this->sanitizeText($product_info['model']) : '');
-				$this->writeElementAlways($xml, 'label', '');
-				$this->writeElementAlways($xml, 'order', $sort_order);
-
-				$desc = $this->plainText($product_info['description']);
-				$this->writeElementAlways($xml, 'description', $this->sanitizeText($desc));
-
-				$short = $this->getShortDescription($product_info, $desc, $short_source);
-				$this->writeElementAlways($xml, 'short_description', ($short !== '') ? $this->sanitizeText($short) : '');
-
-				// attributes params
-				$this->writeParams($xml, $attributes_params);
-
-				// options params (all options)
-				$this->writeOptionsParams($xml, $options, $filter_option_map, 0);
-
-				$xml->endElement(); // offer
+			if ($price_mode === 'special_as_price' && $special_price !== null) {
+				$price = (float)$special_price;
+				$old_price = $this->formatMoney($base_price);
 			}
+
+			$xml->startElement('offer');
+			$xml->writeAttribute('id', (string)$product_id);
+			$xml->writeAttribute('available', $available);
+
+			$this->writeElementAlways($xml, 'url', $this->url->link('product/product', 'product_id=' . $product_id, ''));
+			$this->writeElementAlways($xml, 'name', $this->sanitizeText($product_info['name']));
+			$this->writeElementAlways($xml, 'price', $this->formatMoney($price));
+			$this->writeElementAlways($xml, 'old_price', $old_price);
+			$this->writeElementAlways($xml, 'currency', $currency);
+			$this->writeElementAlways($xml, 'categoryId', $category_id ? (string)$category_id : '');
+			$this->writeElementAlways($xml, 'quantity', (string)$qty);
+			$this->writeElementAlways($xml, 'stock_status', $stock_status);
+
+			if (!empty($images)) {
+				foreach ($images as $u) $this->writeElementAlways($xml, 'picture', $u);
+			} else {
+				$this->writeElementAlways($xml, 'picture', '');
+			}
+
+			$this->writeElementAlways($xml, 'vendor', !empty($product_info['manufacturer']) ? $this->sanitizeText($product_info['manufacturer']) : '');
+			$this->writeElementAlways($xml, 'sku', !empty($product_info['model']) ? $this->sanitizeText($product_info['model']) : '');
+			$this->writeElementAlways($xml, 'label', '');
+			$this->writeElementAlways($xml, 'order', $sort_order);
+
+			$desc = $this->plainText($product_info['description']);
+			$this->writeElementAlways($xml, 'description', $this->sanitizeText($desc));
+
+			$short = $this->getShortDescription($product_info, $desc, $short_source);
+			$this->writeElementAlways($xml, 'short_description', ($short !== '') ? $this->sanitizeText($short) : '');
+
+			// attributes params
+			$this->writeParams($xml, $attributes_params);
+
+			// options params (все опции -> только как param)
+			$this->writeOptionsParams($xml, $options, $filter_option_map, 0);
+
+			$xml->endElement(); // offer
 		}
 
 		$xml->endElement(); // offers
@@ -454,37 +365,9 @@ class ControllerFeedEleadsYml extends Controller
 	}
 
 	// =========================================================
-	// Variants / Options
+	// Options => params + filter="true"
 	// =========================================================
 
-	private function getVariantOption($options)
-	{
-		if (empty($options) || !is_array($options)) return null;
-
-		foreach ($options as $opt) {
-			if (!empty($opt['option_value']) && is_array($opt['option_value'])) {
-				return $opt;
-			}
-		}
-
-		return null;
-	}
-
-	private function getOptionPriceAdjustment($ov)
-	{
-		$price  = isset($ov['price']) ? (float)$ov['price'] : 0.0;
-		$prefix = isset($ov['price_prefix']) ? (string)$ov['price_prefix'] : '+';
-
-		if ($price == 0.0) return 0.0;
-		return ($prefix === '-') ? (0.0 - $price) : $price;
-	}
-
-	/**
-	 * Write option params
-	 * - if option has multiple values => output one <param> per value (same as you did before)
-	 * - filter="true" if option_id selected in admin
-	 * - skip_option_id allows excluding variant option when we already wrote it
-	 */
 	private function writeOptionsParams(XMLWriter $xml, $options, $filter_option_map, $skip_option_id = 0)
 	{
 		if (empty($options) || !is_array($options)) return;
@@ -498,16 +381,24 @@ class ControllerFeedEleadsYml extends Controller
 
 			$is_filter = ($option_id > 0 && isset($filter_option_map[$option_id]));
 
+			$values = array();
+
 			if (!empty($opt['option_value']) && is_array($opt['option_value'])) {
 				foreach ($opt['option_value'] as $ov) {
 					$val_name = isset($ov['name']) ? trim((string)$ov['name']) : '';
 					if ($val_name === '') continue;
-
-					$this->writeParam($xml, $opt_name, $val_name, $is_filter);
+					$values[] = $val_name;
 				}
-			} else {
-				$this->writeParam($xml, $opt_name, '', $is_filter);
 			}
+
+			if (!empty($values)) {
+				$values = array_values(array_unique($values));
+				$value_str = implode(' | ', $values);
+			} else {
+				$value_str = '';
+			}
+
+			$this->writeParam($xml, $opt_name, $value_str, $is_filter);
 		}
 	}
 
